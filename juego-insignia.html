@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>INSIGNIA - Descubre si ganaste</title>
+  <style>
+    :root{
+      --bg:#dddddd;
+      --accent:#111318;
+      --input-border:#2f3a3a;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      -webkit-font-smoothing:antialiased;
+      color:var(--accent);
+    }
+
+    .container{
+      min-height:100%;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:36px 20px;
+    }
+
+    .card{
+      width:100%;
+      max-width:480px;
+      background:transparent;
+      text-align:center;
+      padding:20px 28px 40px;
+      box-sizing:border-box;
+      border-radius:12px;
+    }
+
+    .logo{
+      width:300px;
+      height:auto;
+      margin:20px auto 25px;
+      display:block;
+      filter: drop-shadow(0 6px 15px rgba(0,0,0,0.15));
+    }
+
+    h1{
+      margin:12px 0 6px;
+      font-size:28px;
+      letter-spacing:1px;
+      font-weight:800;
+    }
+    p.subtitle{
+      margin:0 0 18px;
+      color:#333;
+      font-size:13px;
+    }
+
+    .form{
+      margin-top:12px;
+    }
+    .field{
+      margin-bottom:14px;
+    }
+
+    input[type="text"]{
+      width:100%;
+      padding:20px 18px;
+      border-radius:12px;
+      border:2px solid var(--input-border);
+      background:transparent;
+      box-sizing:border-box;
+      font-size:16px;
+      outline:none;
+      color:var(--accent);
+    }
+    input::placeholder{ color:#6b6b6b; }
+
+    .btn{
+      display:block;
+      width:100%;
+      margin-top:16px;
+      padding:18px;
+      border-radius:16px;
+      background:var(--accent);
+      color:var(--bg);
+      font-weight:800;
+      font-size:18px;
+      border:none;
+      cursor:pointer;
+      box-shadow: 0 6px 20px rgba(17,19,24,0.18);
+    }
+    .btn:active{ transform:translateY(1px); }
+
+    .btn-secondary{
+      background:transparent;
+      color:var(--accent);
+      border:2px solid var(--accent);
+      margin-top:10px;
+    }
+
+    #resultado{
+      margin-top:18px;
+      min-height:68px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:18px;
+    }
+
+    .win{
+      color:#0a6b3a;
+      background: rgba(10,107,58,0.06);
+      padding:12px 16px;
+      border-radius:10px;
+    }
+    .lose{
+      color:#7a2b2b;
+      background: rgba(122,43,43,0.05);
+      padding:12px 16px;
+      border-radius:10px;
+    }
+
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color:#444;
+    }
+
+    /* Estilos para código generado */
+    .codigo-generado{
+      background: #f8f8f8;
+      border: 2px dashed #666;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: bold;
+      display: none;
+    }
+
+    .copy-btn{
+      background: #666;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    /* Admin panel */
+    .admin-toggle{
+      margin-top:14px;
+      font-size:12px;
+      color:#666;
+      cursor:pointer;
+      text-decoration:underline;
+    }
+    .admin-panel{
+      margin-top:14px;
+      background:rgba(0,0,0,0.03);
+      padding:12px;
+      border-radius:8px;
+      display:none;
+      text-align:left;
+    }
+    .admin-panel label{ font-size:13px; display:block; margin-bottom:6px; color:#222;}
+    .small{
+      padding:8px 10px;
+      border-radius:8px;
+      border:1px solid #ccc;
+      margin-right:6px;
+    }
+    .codes-list{
+      margin-top:10px;
+      max-height:140px;
+      overflow:auto;
+      font-family:monospace;
+      font-size:13px;
+      background:#fff;
+      padding:8px;
+      border-radius:6px;
+      border:1px solid #e3e3e3;
+    }
+
+    .admin-stats{
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border: 1px solid #e3e3e3;
+    }
+
+    @media (max-width:420px){
+      .logo{ width:150px; }
+      h1{ font-size:24px; }
+      input{ padding:16px; font-size:15px; }
+      .btn{ padding:16px; font-size:16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" role="main">
+      <img class="logo" alt="Insignia logo" src="empresa.jpg" />
+
+      <h1>DESCUBRE SI GANASTE</h1>
+      <p class="subtitle"><strong>EL 50% DE DESCUENTO</strong></p>
+
+      <div class="form" aria-live="polite">
+        <!-- Solo nombre -->
+        <div class="field">
+          <input id="nombre" type="text" placeholder="Tu nombre" autocomplete="name" />
+        </div>
+
+        <!-- Botón para obtener código -->
+        <button id="btnObtenerCodigo" class="btn btn-secondary">🎲 OBTENER CÓDIGO</button>
+
+        <!-- Código generado -->
+        <div class="codigo-generado" id="codigoGenerado">
+          <div>Tu código único:</div>
+          <strong id="codigoTexto"></strong>
+          <button class="copy-btn" onclick="copiarCodigo()">📋 Copiar código</button>
+        </div>
+
+        <div class="field">
+          <input id="codigo" type="text" placeholder="Digita aquí el código que obtuviste" />
+        </div>
+
+        <button id="btnJugar" class="btn">DESCUBRIR RESULTADO</button>
+
+        <div id="resultado" aria-live="polite"></div>
+
+        <div class="note">Cada código es válido solo 1 vez.</div>
+
+        <div class="admin-toggle" id="adminToggle">Panel administrador</div>
+
+        <div class="admin-panel" id="adminPanel" aria-hidden="true">
+          <label>Contraseña admin:
+            <input id="adminPass" class="small" type="password" placeholder="Ingresa contraseña"/>
+            <button id="loginBtn" class="small">Entrar</button>
+          </label>
+
+          <div id="adminArea" style="display:none; margin-top:8px;">
+            
+            <div class="admin-stats" id="adminStats">
+              <strong>Estadísticas:</strong><br>
+              <span id="statsText">Cargando...</span>
+            </div>
+
+            <label>Configuración:</label>
+            <div style="margin: 5px 0;">
+              <button id="genLoteBtn" class="small">Generar 20 códigos</button>
+              <button id="clearAll" class="small">Limpiar todo</button>
+              <button id="exportBtn" class="small">📊 Exportar</button>
+            </div>
+
+            <label>Códigos disponibles:</label>
+            <div class="codes-list" id="codesList"></div>
+
+            <label>Códigos usados:</label>
+            <div class="codes-list" id="usedList"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const btnObtenerCodigo = document.getElementById('btnObtenerCodigo');
+    const btnJugar = document.getElementById('btnJugar');
+    const resultado = document.getElementById('resultado');
+    const codigoGenerado = document.getElementById('codigoGenerado');
+    const codigoTexto = document.getElementById('codigoTexto');
+
+    // Storage keys
+    const KEY_CODES = 'insignia_codes';
+    const KEY_USED = 'insignia_used';
+    const ADMIN_PASSWORD = 'Familia@InsigniaRojasBolaño';
+
+    // Variables globales
+    let codigoActual = '';
+
+    // Cargar desde localStorage
+    function loadCodes(){
+      try {
+        return JSON.parse(localStorage.getItem(KEY_CODES) || '[]');
+      } catch(e){ return []; }
+    }
+    function saveCodes(arr){ localStorage.setItem(KEY_CODES, JSON.stringify(arr)); }
+
+    function loadUsed(){
+      try {
+        return JSON.parse(localStorage.getItem(KEY_USED) || '{}');
+      } catch(e){ return {}; }
+    }
+    function saveUsed(obj){ localStorage.setItem(KEY_USED, JSON.stringify(obj)); }
+
+    // Generar código único
+    function generateCode(){
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let codigo = 'INS-';
+      for (let i = 0; i < 5; i++) {
+        codigo += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return codigo;
+    }
+
+    // Obtener código para el cliente
+    btnObtenerCodigo.addEventListener('click', () => {
+      const nombre = document.getElementById('nombre').value.trim();
+
+      if(!nombre){
+        alert('Primero ingresa tu nombre.');
+        return;
+      }
+
+      const codes = loadCodes();
+      
+      // Buscar un código disponible
+      if(codes.length === 0){
+        alert('No hay códigos disponibles. Contacta al administrador.');
+        return;
+      }
+
+      // Tomar un código aleatorio de los disponibles
+      const randomIndex = Math.floor(Math.random() * codes.length);
+      codigoActual = codes[randomIndex];
+
+      // Mostrar el código al usuario
+      codigoTexto.textContent = codigoActual;
+      codigoGenerado.style.display = 'block';
+      
+      // Auto-completar el campo de código
+      document.getElementById('codigo').value = codigoActual;
+
+      // Deshabilitar el botón para evitar múltiples clics
+      btnObtenerCodigo.disabled = true;
+      btnObtenerCodigo.textContent = '✅ CÓDIGO OBTENIDO';
+    });
+
+    // Función para copiar código
+    function copiarCodigo(){
+      navigator.clipboard.writeText(codigoActual).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✅ Copiado!';
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      });
+    }
+
+    // Función que ejecuta el juego
+    btnJugar.addEventListener('click', () => {
+      resultado.innerHTML = '';
+      const nombre = (document.getElementById('nombre').value || '').trim();
+      const codigoInput = document.getElementById('codigo').value.trim().toUpperCase();
+
+      if(!nombre || !codigoInput){
+        alert('Completa todos los campos.');
+        return;
+      }
+
+      // Verificar que el código ingresado coincide con el generado
+      if(codigoInput !== codigoActual){
+        resultado.className = 'lose';
+        resultado.innerHTML = '❌ El código ingresado no coincide.';
+        return;
+      }
+
+      const codes = loadCodes();
+      const used = loadUsed();
+
+      // Validar que el código existe en la lista
+      const idx = codes.indexOf(codigoActual);
+      if(idx === -1){
+        resultado.className = 'lose';
+        resultado.innerHTML = '❌ Código no válido. Obtén un nuevo código.';
+        return;
+      }
+
+      // Verificar si ya fue usado
+      if(used[codigoActual]){
+        resultado.className = 'lose';
+        resultado.innerHTML = '❌ Este código ya fue usado. Obtén un nuevo código.';
+        return;
+      }
+
+      // Procesar el juego
+      codes.splice(idx, 1);
+      saveCodes(codes);
+
+      // Probabilidad 1/10
+      const numero = Math.floor(Math.random() * 10) + 1;
+      const won = (numero === 1);
+
+      // Guardar registro
+      used[codigoActual] = {
+        name: nombre,
+        date: new Date().toISOString(),
+        status: won ? 'won' : 'lost'
+      };
+      saveUsed(used);
+
+      // Mostrar resultado
+      if(won){
+        resultado.className = 'win';
+        resultado.innerHTML = `🎉 FELICIDADES ${escapeHtml(nombre)}<br>¡GANASTE EL 50% DE DESCUENTO!`;
+      } else {
+        resultado.className = 'lose';
+        resultado.innerHTML = `😔 Lo sentimos ${escapeHtml(nombre)}<br>No ganaste esta vez.`;
+      }
+
+      // Resetear para siguiente jugador
+      setTimeout(() => {
+        resetForm();
+      }, 4000);
+
+      refreshAdminLists();
+    });
+
+    function resetForm(){
+      document.getElementById('nombre').value = '';
+      document.getElementById('codigo').value = '';
+      codigoGenerado.style.display = 'none';
+      btnObtenerCodigo.disabled = false;
+      btnObtenerCodigo.textContent = '🎲 OBTENER CÓDIGO';
+      codigoActual = '';
+      resultado.innerHTML = '';
+    }
+
+    // ---------- Admin panel ----------
+    const adminToggle = document.getElementById('adminToggle');
+    const adminPanel = document.getElementById('adminPanel');
+    const loginBtn = document.getElementById('loginBtn');
+    const adminPass = document.getElementById('adminPass');
+    const adminArea = document.getElementById('adminArea');
+    const genLoteBtn = document.getElementById('genLoteBtn');
+    const clearAll = document.getElementById('clearAll');
+    const exportBtn = document.getElementById('exportBtn');
+    const codesList = document.getElementById('codesList');
+    const usedList = document.getElementById('usedList');
+    const adminStats = document.getElementById('adminStats');
+    const statsText = document.getElementById('statsText');
+
+    adminToggle.addEventListener('click', () => {
+      adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    loginBtn.addEventListener('click', () => {
+      if(adminPass.value === ADMIN_PASSWORD){
+        adminArea.style.display = 'block';
+        adminPanel.setAttribute('aria-hidden','false');
+        adminPass.value = '';
+        refreshAdminLists();
+      } else {
+        alert('Contraseña admin incorrecta.');
+      }
+    });
+
+    genLoteBtn.addEventListener('click', () => {
+      const codes = loadCodes();
+      const nuevos = [];
+      for(let i = 0; i < 20; i++){
+        const nuevoCodigo = generateCode();
+        if(!codes.includes(nuevoCodigo)){
+          codes.push(nuevoCodigo);
+          nuevos.push(nuevoCodigo);
+        }
+      }
+      saveCodes(codes);
+      refreshAdminLists();
+      alert(`Se generaron ${nuevos.length} nuevos códigos. Total disponibles: ${codes.length}`);
+    });
+
+    clearAll.addEventListener('click', () => {
+      if(!confirm('¿Borrar TODOS los códigos y registros?')) return;
+      localStorage.removeItem(KEY_CODES);
+      localStorage.removeItem(KEY_USED);
+      refreshAdminLists();
+      alert('Sistema reiniciado.');
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const used = loadUsed();
+      const csv = ['Código,Nombre,Fecha,Estado'];
+      
+      Object.keys(used).forEach(codigo => {
+        const u = used[codigo];
+        csv.push(`"${codigo}","${u.name}","${u.date}","${u.status}"`);
+      });
+      
+      const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `insignia_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    });
+
+    function refreshAdminLists(){
+      const codes = loadCodes();
+      const used = loadUsed();
+      
+      // Estadísticas
+      const totalUsados = Object.keys(used).length;
+      const ganadores = Object.values(used).filter(u => u.status === 'won').length;
+      const porcentaje = totalUsados > 0 ? ((ganadores / totalUsados) * 100).toFixed(1) : 0;
+      
+      statsText.innerHTML = `
+        Disponibles: <strong>${codes.length}</strong><br>
+        Participaciones: ${totalUsados}<br>
+        Ganadores: ${ganadores}<br>
+        Tasa: ${porcentaje}%
+      `;
+
+      codesList.innerText = codes.length ? codes.join('\n') : '(No hay códigos)';
+      const usedArr = Object.keys(used).map(k => `${k} — ${used[k].name} — ${used[k].status}`);
+      usedList.innerText = usedArr.length ? usedArr.join('\n') : '(No hay usados)';
+    }
+
+    // ---------- Utility functions ----------
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, function(m){ 
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+      });
+    }
+
+    // Inicialización: generar códigos iniciales si no existen
+    (function initDemo(){
+      const codes = loadCodes();
+      if(codes.length === 0){
+        const demo = [];
+        for(let i = 0; i < 25; i++) {
+          demo.push(generateCode());
+        }
+        saveCodes(demo);
+      }
+      refreshAdminLists();
+    })();
+  </script>
+</body>
+</html>
